@@ -1,6 +1,6 @@
 {
     "name": "libsensor",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A library built on esp-idf for reading hardware sensors by polling or reciept of IRQ messages.",
     "keywords": "admin, mqtt, sensor, isr, irq, poll, task, esp-idf, esp32, esp8266",
     "repository": {
