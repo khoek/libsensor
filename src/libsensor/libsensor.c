@@ -198,10 +198,6 @@ static bool poll_loop(const sensor_info_t* info) {
                 break;
             }
             case POLL_RESULT_UNEVENTFUL: {
-                if (info->type->poll_delay_ms) {
-                    vTaskDelay(1 + (info->type->poll_delay_ms / portTICK_PERIOD_MS));
-                }
-
                 consecutive_uneventful_iters++;
                 if (consecutive_uneventful_iters > info->type->max_uneventful_iters) {
                     libiot_logf_error(TAG, "poll_loop() gave up due to uneventfulness, caused by: %s-%s", info->type->name, info->tag);
@@ -217,6 +213,10 @@ static bool poll_loop(const sensor_info_t* info) {
                 ESP_LOGE(TAG, "unknown poll result!");
                 abort();
             }
+        }
+
+        if (info->type->poll_delay_ms) {
+            vTaskDelay(1 + (info->type->poll_delay_ms / portTICK_PERIOD_MS));
         }
     }
 }
