@@ -1,6 +1,6 @@
 {
     "name": "libsensor",
-    "version": "2.0.1",
+    "version": "3.0.0",
     "description": "A library built on esp-idf for reading hardware sensors by polling or reciept of IRQ messages.",
     "keywords": "admin, mqtt, sensor, isr, irq, poll, task, esp-idf, esp32, esp8266",
     "repository": {
@@ -19,7 +19,7 @@
     "frameworks": "espidf",
     "platforms": "espressif32",
     "dependencies": {
-        "khoek/libesp": "^2.0.0",
-        "khoek/libiot": "^2.0.0"
+        "khoek/libesp": "^2.2.0",
+        "khoek/libiot": "^3.0.0"
     }
 }
