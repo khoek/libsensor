@@ -9,12 +9,30 @@
 // print the stack high water marks for each task started by libsensor.
 //
 // Default is 100.
-// #define LIBSENSOR_WARNING_THRESHOLD_STACK_HIGHWATERMARK
+// #define LIBSENSOR_WARNING_THRESHOLD_STACK_HIGHWATERMARK 100
+
+// Configure the dispatch task stack size.
+//
+// Default is 3072.
+// #define LIBSENSOR_DISPATCH_TASK_STACK_SIZE 3072
+
+// Configure the max concurrently-registered sensor count.
+//
+// Default is 16.
+// #define LIBSENSOR_MAX_SENSOR_COUNT 16
 
 ////////
 
 #ifndef LIBSENSOR_WARNING_THRESHOLD_STACK_HIGHWATERMARK
 #define LIBSENSOR_WARNING_THRESHOLD_STACK_HIGHWATERMARK 100
+#endif
+
+#ifndef LIBSENSOR_DISPATCH_TASK_STACK_SIZE
+#define LIBSENSOR_DISPATCH_TASK_STACK_SIZE 3072
+#endif
+
+#ifndef LIBSENSOR_MAX_SENSOR_COUNT
+#define LIBSENSOR_MAX_SENSOR_COUNT 16
 #endif
 
 #include <cJSON.h>

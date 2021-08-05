@@ -11,8 +11,6 @@
 static const char* TAG = "libsensor";
 
 #define DISPATCH_TASK_PRIORITY 15
-#define DISPATCH_TASK_STACK_SIZE 2048
-
 #define DISPATCH_QUEUE_LENGTH 16
 
 #define POLL_TASK_PRIORITY 10
@@ -21,9 +19,7 @@ static const char* TAG = "libsensor";
 #define REPORT_TASK_PRIORITY 5
 #define DEFAULT_REPORT_TASK_STACK_SIZE 3072
 
-#define DEFAULT_REPORT_QUEUE_LENGTH 16
-
-#define MAX_SENSOR_COUNT 16
+#define DEFAULT_SENSOR_ITEM_QUEUE_LENGTH 16
 
 #define IN_TOPIC_PREFIX_BUFF_LEN 64
 
@@ -67,7 +63,7 @@ static uint8_t
 static SemaphoreHandle_t global_state_lock;
 static StaticSemaphore_t global_state_lock_static;
 static size_t global_sensor_count = 0;
-static sensor_info_t* global_sensor_list[MAX_SENSOR_COUNT];
+static sensor_info_t* global_sensor_list[LIBSENSOR_MAX_SENSOR_COUNT];
 
 static char global_sensor_in_topic_prefix[IN_TOPIC_PREFIX_BUFF_LEN];
 static size_t global_sensor_in_topic_prefix_len;
@@ -132,8 +128,8 @@ void libsensor_init() {
                            &global_dispatch_queue_static);
 
     assert(xTaskCreate(&task_dispatch, "libsensor_dispatch",
-                       DISPATCH_TASK_STACK_SIZE, NULL, DISPATCH_TASK_PRIORITY,
-                       NULL)
+                       LIBSENSOR_DISPATCH_TASK_STACK_SIZE, NULL,
+                       DISPATCH_TASK_PRIORITY, NULL)
            == pdPASS);
 
     libiot_mqtt_build_local_topic_from_suffix(
@@ -153,10 +149,15 @@ static void add_sensor(sensor_info_t* info) {
     while (xSemaphoreTake(global_state_lock, portMAX_DELAY) != pdTRUE)
         ;
 
+    if (global_sensor_count > LIBSENSOR_MAX_SENSOR_COUNT) {
+        ESP_LOGE(TAG, "too many sensors registered! (max %u)",
+                 LIBSENSOR_MAX_SENSOR_COUNT);
+        abort();
+    }
+
     sensor_info_t** spot = &global_sensor_list[global_sensor_count];
 
     global_sensor_count++;
-    assert(global_sensor_count < MAX_SENSOR_COUNT);
 
     *spot = info;
 
@@ -215,7 +216,7 @@ esp_err_t libsensor_register(const sensor_type_t* type, const char* name,
 
     size_t queue_length = type->queue_length;
     if (!queue_length) {
-        queue_length = DEFAULT_REPORT_QUEUE_LENGTH;
+        queue_length = DEFAULT_SENSOR_ITEM_QUEUE_LENGTH;
     }
 
     // Note: it is the job of the reporter task to free the `sensor_info_t`
