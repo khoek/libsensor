@@ -3,10 +3,10 @@
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/event_groups.h>
+#include <libesp.h>
 #include <libesp/json.h>
 #include <libiot.h>
 #include <string.h>
-#include <sys/time.h>
 
 static const char* TAG = "libsensor";
 
@@ -385,13 +385,7 @@ void libsensor_output_item_with_time(sensor_output_handle_t output, void* item,
 
 void libsensor_output_item(sensor_output_handle_t output, void* item) {
     // It's up to us to provide a default time.
-    struct timeval time;
-    assert(!gettimeofday(&time, NULL));
-
-    // TODO This is susceptible to the Y2K38 bug, migrate to fix in esp-idf
-    // v5.0.
-    uint64_t epoch_time_ms =
-        ((uint64_t) time.tv_sec) * 1000 + ((uint64_t) time.tv_usec) / 1000;
+    uint64_t epoch_time_ms = util_current_epoch_time_ms();
     libsensor_output_item_with_time(output, item, epoch_time_ms);
 }
 
